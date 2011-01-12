@@ -1,0 +1,11 @@
+Changes
+
+0.8
+
+  * xbmc dharma addon support added
+  * set mime type to avoid libcurl scans of every item
+  * new icon from freezy3k (thanks!)
+
+0.7
+
+  * earlier releases history on http://code.google.com/p/xbmc-addons
