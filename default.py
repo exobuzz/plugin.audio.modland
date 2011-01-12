@@ -6,9 +6,10 @@ import xbmc, xbmcgui, xbmcplugin, xbmcaddon
 __plugin__     = "Modland"
 __author__     = "BuZz [buzz@exotica.org.uk] / http://www.exotica.org.uk"
 __svn_url__    = "http://xbmc-addons.googlecode.com/svn/trunk/plugins/music/modland"
-__version__    = "0.9"
+__version__    = "0.10"
 
-__addon__ = xbmcaddon.Addon('plugin.audio.modland')
+__settings__ = xbmcaddon.Addon('plugin.audio.modland')
+__language__ = __settings__.getLocalizedString
 
 MODLAND_URL = "http://www.exotica.org.uk/mediawiki/extensions/ExoticASearch/Modland_xbmc.php"
 #MODLAND_URL = 'http://exotica.travelmate/mediawiki/extensions/ExoticASearch/Modland_xbmc.php'
@@ -20,7 +21,7 @@ try:
 except:
   xbmc_rev = 0
 
-PLUGIN_DATA = __addon__.getAddonInfo('profile')
+PLUGIN_DATA = __settings__.getAddonInfo('profile')
 SEARCH_FILE = os.path.join(PLUGIN_DATA, "search.txt")
 
 if not os.path.isdir(PLUGIN_DATA):
@@ -48,7 +49,7 @@ def get_params(defaults):
 
 def show_options():
   url =  sys.argv[0] + '?' + urllib.urlencode( { 'mode': "search" } )
-  li = xbmcgui.ListItem("Search for game/demo music on Modland")
+  li = xbmcgui.ListItem(__language__(30000))
   ok = xbmcplugin.addDirectoryItem(handle, url, listitem = li, isFolder = True)
 
   # get list of saved searches
@@ -57,13 +58,13 @@ def show_options():
     li = xbmcgui.ListItem(search)
     url = sys.argv[0] + '?' + urllib.urlencode( { 'mode': "search", 'search': search } )
     cmd = "XBMC.RunPlugin(%s?mode=deletesearch&search=%s)" % (sys.argv[0], urllib.quote_plus(search) )
-    li.addContextMenuItems( [ ("Delete saved search", cmd) ] )
+    li.addContextMenuItems( [ (__language__(30001), cmd) ] )
     ok = xbmcplugin.addDirectoryItem(handle, url, listitem = li, isFolder = True)
 
   xbmcplugin.endOfDirectory(handle, succeeded = True, updateListing = False, cacheToDisc = False )
 
 def get_search():
-  kb = xbmc.Keyboard("", "Enter search string")
+  kb = xbmc.Keyboard("", __language__(30002))
   kb.doModal()
   if not kb.isConfirmed():
     return None

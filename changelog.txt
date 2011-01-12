@@ -1,5 +1,9 @@
 Changes
 
+0.10
+
+  * localise strings
+
 0.9
 
   * changes to plugin save path for addon system
