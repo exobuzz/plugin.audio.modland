@@ -1,12 +1,14 @@
 import sys, os
 import urllib, cgi, re, htmlentitydefs, xml.dom.minidom
-import xbmc, xbmcgui, xbmcplugin
+import xbmc, xbmcgui, xbmcplugin, xbmcaddon
 
 # plugin constants
 __plugin__     = "Modland"
 __author__     = "BuZz [buzz@exotica.org.uk] / http://www.exotica.org.uk"
 __svn_url__    = "http://xbmc-addons.googlecode.com/svn/trunk/plugins/music/modland"
-__version__    = "0.8"
+__version__    = "0.9"
+
+__addon__ = xbmcaddon.Addon('plugin.audio.modland')
 
 MODLAND_URL = "http://www.exotica.org.uk/mediawiki/extensions/ExoticASearch/Modland_xbmc.php"
 #MODLAND_URL = 'http://exotica.travelmate/mediawiki/extensions/ExoticASearch/Modland_xbmc.php'
@@ -18,7 +20,7 @@ try:
 except:
   xbmc_rev = 0
 
-PLUGIN_DATA = xbmc.translatePath("special://masterprofile/plugin_data/" + __plugin__ )
+PLUGIN_DATA = __addon__.getAddonInfo('profile')
 SEARCH_FILE = os.path.join(PLUGIN_DATA, "search.txt")
 
 if not os.path.isdir(PLUGIN_DATA):

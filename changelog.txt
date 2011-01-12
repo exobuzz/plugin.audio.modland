@@ -1,5 +1,9 @@
 Changes
 
+0.9
+
+  * changes to plugin save path for addon system
+
 0.8
 
   * xbmc dharma addon support added
