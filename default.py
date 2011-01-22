@@ -102,13 +102,7 @@ def get_results(search):
     li.setInfo( type = 'music', infoLabels = { 'title': label, 'genre': format, 'artist': artist, 'album': collect } )
     li.setProperty('mimetype', 'audio/ogg')
 
-    # revision 26603 adds my patch with support for ogg mime types for paplayer so we can pass
-    # the url directly, otherwise we pass back to the plugin and force an alternative player
-    if xbmc_rev >= 26603:
-      url = stream_url
-    else:
-      url = sys.argv[0] + '?'
-      url += urllib.urlencode( { 'mode': 'play', 'title': title, 'artist': artist, 'genre': format, 'album': collect, 'url': stream_url } )
+    url = stream_url
 
     ok = xbmcplugin.addDirectoryItem(handle, url, listitem = li, isFolder = False, totalItems = count)
 
@@ -167,13 +161,3 @@ elif mode == 'search':
     get_results(search)
   else:
     show_options()
-
-elif mode == 'play':
-  title = urllib.unquote_plus(params['title'])
-  artist = urllib.unquote_plus(params['artist'])
-  genre = urllib.unquote_plus(params['genre'])
-  album = urllib.unquote_plus(params['album'])
-  url = urllib.unquote_plus(params['url'])
-
-  info = { 'title': title, 'artist': artist, 'genre': genre, 'album': album }
-  play_stream(url, title, info)
