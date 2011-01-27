@@ -140,13 +140,13 @@ def download_and_play(url, file):
   player.play(filepath)
 
 def make_filename(name):
-    import unicodedata
-    # remove extension
-    name = os.path.splitext(name)[0]
-    # normalise and strip non valid chars
-    name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
-    name = re.sub('[^a-zA-Z0-9_\-.() ]+', '', name)
-    return name
+  import unicodedata
+  # remove extension
+  name = os.path.splitext(name)[0]
+  # normalise and strip non valid chars
+  name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
+  name = re.sub('[^a-zA-Z0-9_\-.() ]+', '', name)
+  return name
 
 # load a list from a file, removing any duplicates and stripped wihtespace/linefeeds
 def load_list(file):
