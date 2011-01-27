@@ -67,7 +67,7 @@ def show_options():
 
   xbmcplugin.endOfDirectory(handle, succeeded = True, updateListing = False, cacheToDisc = False )
 
-def get_search(search):
+def get_search(search = ''):
   kb = xbmc.Keyboard(search, __language__(30002))
   kb.doModal()
   if not kb.isConfirmed():
