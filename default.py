@@ -12,7 +12,6 @@ __settings__ = xbmcaddon.Addon('plugin.audio.modland')
 __language__ = __settings__.getLocalizedString
 
 MODLAND_URL = "http://www.exotica.org.uk/mediawiki/extensions/ExoticASearch/Modland_xbmc.php"
-#MODLAND_URL = 'http://exotica.travelmate/mediawiki/extensions/ExoticASearch/Modland_xbmc.php'
 
 try: __xbmc_version__ = xbmc.getInfoLabel('System.BuildVersion')
 except: __xbmc_version__ = 'Unknown'
@@ -135,6 +134,7 @@ def download_and_play(url, file):
   filepath = os.path.join(path, file + '.ogg')
   xbmc.executebuiltin('Notification(Modland - Downloading...,' + file + ', -1)')
   urllib.urlretrieve (url, filepath)
+  urllib.urlcleanup()
   xbmc.executebuiltin('Notification(Modland - Downloaded,' + file + ', 1)')
   player = xbmc.Player(xbmc.PLAYER_CORE_PAPLAYER)
   player.play(filepath)
@@ -146,10 +146,6 @@ def make_filename(name):
     # normalise and strip non valid chars
     name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
     name = re.sub('[^a-zA-Z0-9_\-.() ]+', '', name)
-    try: xbmc_os = os.environ.get('OS')
-    except: xbmc_os = "unknown"
-    # limit length on xbox (excluding .xxx extension)
-    if xbmc_os == 'xbox': name = name[:38]
     return name
 
 # load a list from a file, removing any duplicates and stripped wihtespace/linefeeds
