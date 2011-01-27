@@ -1,6 +1,6 @@
 import sys, os
 import urllib, cgi, re, htmlentitydefs, xml.dom.minidom
-import xbmc, xbmcgui, xbmcplugin, xbmcaddon
+import xbmc, xbmcgui, xbmcplugin
 
 # plugin constants (used for svn repo installer on xbmc4xbox)
 __plugin__     = "Modland"
@@ -8,8 +8,8 @@ __author__     = "BuZz [buzz@exotica.org.uk] / http://www.exotica.org.uk"
 __svn_url__    = "http://xbmc-addons.googlecode.com/svn/trunk/plugins/music/modland"
 __version__    = "0.12"
 
-__settings__ = xbmcaddon.Addon('plugin.audio.modland')
-__language__ = __settings__.getLocalizedString
+__settings__ = xbmcplugin
+__language__ = xbmc.getLocalizedString
 
 MODLAND_URL = "http://www.exotica.org.uk/mediawiki/extensions/ExoticASearch/Modland_xbmc.php"
 
@@ -20,7 +20,7 @@ class AppURLopener(urllib.FancyURLopener):
 
 urllib._urlopener = AppURLopener()
 
-PLUGIN_DATA = __settings__.getAddonInfo('profile')
+PLUGIN_DATA = xbmc.translatePath("special://masterprofile/plugin_data/" + __plugin__)
 SEARCH_FILE = os.path.join(PLUGIN_DATA, "search.txt")
 
 if not os.path.isdir(PLUGIN_DATA):
@@ -124,7 +124,7 @@ def get_results(search):
 
 def download_and_play(url, file):
   path = __settings__.getSetting('download_path')
-  if path == '': __settings__.openSettings()
+  if path == '': __settings__.openSettings(sys.argv[0])
   path = __settings__.getSetting('download_path')
   if path == '':
       d = xbmcgui.Dialog()
@@ -137,7 +137,7 @@ def download_and_play(url, file):
   urllib.urlcleanup()
   xbmc.executebuiltin('Notification(Modland - Downloaded,' + file + ', 1)')
   player = xbmc.Player(xbmc.PLAYER_CORE_PAPLAYER)
-  player.play(filepath)
+  player.play( filepath )
 
 def make_filename(name):
     import unicodedata
@@ -146,6 +146,10 @@ def make_filename(name):
     # normalise and strip non valid chars
     name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
     name = re.sub('[^a-zA-Z0-9_\-.() ]+', '', name)
+    try: xbmc_os = os.environ.get('OS')
+    except: xbmc_os = "unknown"
+    # limit length on xbox (excluding .xxx extension)
+    if xbmc_os == 'xbox': name = name[:38]
     return name
 
 # load a list from a file, removing any duplicates and stripped wihtespace/linefeeds
