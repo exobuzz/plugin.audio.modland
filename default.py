@@ -2,11 +2,11 @@ import sys, os
 import urllib, cgi, re, htmlentitydefs, xml.dom.minidom
 import xbmc, xbmcgui, xbmcplugin, xbmcaddon
 
-# plugin constants
+# plugin constants (used for svn repo installer on xbmc4xbox)
 __plugin__     = "Modland"
 __author__     = "BuZz [buzz@exotica.org.uk] / http://www.exotica.org.uk"
 __svn_url__    = "http://xbmc-addons.googlecode.com/svn/trunk/plugins/music/modland"
-__version__    = "0.11"
+__version__    = "0.12"
 
 __settings__ = xbmcaddon.Addon('plugin.audio.modland')
 __language__ = __settings__.getLocalizedString
@@ -57,14 +57,18 @@ def show_options():
   for search in search_list:
     li = xbmcgui.ListItem(search)
     url = sys.argv[0] + '?' + urllib.urlencode( { 'mode': "search", 'search': search } )
-    cmd = "XBMC.RunPlugin(%s?mode=deletesearch&search=%s)" % (sys.argv[0], urllib.quote_plus(search) )
-    li.addContextMenuItems( [ (__language__(30001), cmd) ] )
+    search_q = urllib.quote_plus(search)
+    menu_items = [
+      ( __language__(30006), "XBMC.RunPlugin(%s?mode=edit&search=%s)" % (sys.argv[0], search_q ) ),
+      ( __language__(30001), "XBMC.RunPlugin(%s?mode=delete&search=%s)" % (sys.argv[0], search_q ) ),
+      ]
+    li.addContextMenuItems( menu_items )
     ok = xbmcplugin.addDirectoryItem(handle, url, listitem = li, isFolder = True)
 
   xbmcplugin.endOfDirectory(handle, succeeded = True, updateListing = False, cacheToDisc = False )
 
-def get_search():
-  kb = xbmc.Keyboard("", __language__(30002))
+def get_search(search):
+  kb = xbmc.Keyboard(search, __language__(30002))
   kb.doModal()
   if not kb.isConfirmed():
     return None
@@ -74,6 +78,11 @@ def get_search():
   save_list(SEARCH_FILE, search_list)
   return search
 
+def delete_search(search):
+  search_list = load_list(SEARCH_FILE)
+  search_list.remove(search)
+  save_list(SEARCH_FILE, search_list)
+  
 def get_results(search):
 
   url = MODLAND_URL + '?' + urllib.urlencode( { 'qs': search } )
@@ -102,7 +111,7 @@ def get_results(search):
     li.setInfo( type = 'music', infoLabels = { 'title': label, 'genre': format, 'artist': artist, 'album': collect } )
     li.setProperty('mimetype', 'audio/ogg')
     # download context menu
-    file = artist + ' - ' + title + '.ogg'
+    file = make_filename(artist + ' - ' + title)
     cmd = "XBMC.RunPlugin(%s?mode=download&url=%s&file=%s)" % (sys.argv[0], urllib.quote_plus(stream_url), urllib.quote_plus(file.encode('utf-8')) )
     li.addContextMenuItems( [ (__language__(30003), cmd) ] )
 
@@ -115,18 +124,33 @@ def get_results(search):
   xbmcplugin.endOfDirectory(handle = handle, succeeded = True)
 
 def download_and_play(url, file):
-  while True:
-    path = __settings__.getSetting('download_path')
-    if path == '': __settings__.openSettings()
-    else: break
+  path = __settings__.getSetting('download_path')
+  if path == '': __settings__.openSettings()
+  path = __settings__.getSetting('download_path')
+  if path == '':
+      d = xbmcgui.Dialog()
+      d.ok(__language__(30004), __language__(30005))
+      return
 
-  filepath = os.path.join(path, file)
-  file = file.replace(',','')
+  filepath = os.path.join(path, file + '.ogg')
   xbmc.executebuiltin('Notification(Modland - Downloading...,' + file + ', -1)')
   urllib.urlretrieve (url, filepath)
   xbmc.executebuiltin('Notification(Modland - Downloaded,' + file + ', 1)')
   player = xbmc.Player(xbmc.PLAYER_CORE_PAPLAYER)
   player.play(filepath)
+
+def make_filename(name):
+    import unicodedata
+    # remove extension
+    name = os.path.splitext(name)[0]
+    # normalise and strip non valid chars
+    name = unicodedata.normalize('NFKD', name).encode('ascii', 'ignore')
+    name = re.sub('[^a-zA-Z0-9_\-.() ]+', '', name)
+    try: xbmc_os = os.environ.get('OS')
+    except: xbmc_os = "unknown"
+    # limit length on xbox (excluding .xxx extension)
+    if xbmc_os == 'xbox': name = name[:38]
+    return name
 
 # load a list from a file, removing any duplicates and stripped wihtespace/linefeeds
 def load_list(file):
@@ -154,10 +178,13 @@ search = params['search']
 if mode == None:
   show_options()
 
-elif mode == 'deletesearch':
-  search_list = load_list(SEARCH_FILE)
-  search_list.remove(search)
-  save_list(SEARCH_FILE, search_list)
+elif mode == 'edit':
+  delete_search(search)
+  get_search(search)
+  xbmc.executebuiltin('Container.Refresh')
+
+elif mode == 'delete':
+  delete_search(search)
   xbmc.executebuiltin('Container.Refresh')
 
 elif mode == 'search':
