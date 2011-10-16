@@ -1,5 +1,9 @@
 Changes
 
+0.13
+
+  * Eden version
+
 0.12
 
   * allow editing of saved searches

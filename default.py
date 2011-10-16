@@ -6,7 +6,7 @@ import xbmc, xbmcgui, xbmcplugin, xbmcaddon
 __plugin__     = "Modland"
 __author__     = "BuZz [buzz@exotica.org.uk] / http://www.exotica.org.uk"
 __svn_url__    = "http://xbmc-addons.googlecode.com/svn/trunk/plugins/music/modland"
-__version__    = "0.12"
+__version__    = "0.13"
 
 __settings__ = xbmcaddon.Addon('plugin.audio.modland')
 __language__ = __settings__.getLocalizedString
