@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon
   id="plugin.audio.modland"
-  version="0.14.0"
+  version="0.15.0"
   name="Modland"
-  provider-name="BuZz [buzz@exotica.org.uk]">
+  provider-name="BuZz">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
   </requires>
